@@ -5,6 +5,9 @@ plugins{
     id 'com.gradleup.shadow' version '9.3.1'
 }
 
+group = 'fr.neiyo.scoreboard'
+version = '1.0-SNAPSHOT'
+
 java {
     withSourcesJar()
 
