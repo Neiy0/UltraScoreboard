@@ -46,3 +46,11 @@ dependencies {
     compileOnly "com.buuz135:MultipleHUD:1.0.4"
     compileOnly("com.github.Flash303:HytaleMultipleHUD:v1")
 }
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+        }
+    }
+}
