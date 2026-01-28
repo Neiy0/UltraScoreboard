@@ -1,0 +1,14 @@
+{
+  "Group": "neiyo",
+  "Name": "Ultra Scoreboard",
+  "Version": "1.0.0",
+  "Main": "fr.neiyo.scoreboard",
+  "Description": "A simple and efficient scoreboard library for Hytale servers.",
+  "Authors": [
+    {
+      "Name": "neiyo"
+    }
+  ],
+  "ServerVersion": "*",
+  "Dependencies": {}
+}
