@@ -24,11 +24,6 @@ repositories {
     }
 
     maven {
-        name = "hytale-pre-release"
-        url = uri("https://maven.hytale.com/pre-release")
-    }
-
-    maven {
         name "HytaleModding"
         url "https://maven.hytale-mods.dev/releases"
     }
