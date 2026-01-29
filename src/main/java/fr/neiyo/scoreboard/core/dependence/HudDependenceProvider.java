@@ -1,26 +1,37 @@
 package fr.neiyo.scoreboard.core.dependence;
 
+import fr.neiyo.scoreboard.core.dependence.impl.BuzzMultipleHUDDependence;
 import fr.neiyo.scoreboard.core.dependence.impl.DefaultHudDependence;
+import fr.neiyo.scoreboard.core.dependence.impl.FlashMultipleHUDDependence;
 
-import java.util.ServiceLoader;
+import java.util.List;
 
 public final class HudDependenceProvider {
+
+    private static final List<Class<? extends HudDependence>> IMPLEMENTATIONS = List.of(
+            BuzzMultipleHUDDependence.class,
+            FlashMultipleHUDDependence.class
+    );
 
     private static final HudDependence INSTANCE = create();
 
     private static HudDependence create() {
-        ServiceLoader<HudDependence> loader = ServiceLoader.load(HudDependence.class);
         HudDependence best = null;
-        for (HudDependence dependence : loader) {
+
+        for (Class<? extends HudDependence> clazz : IMPLEMENTATIONS) {
             try {
-                if (!dependence.isAvailable()) continue;
-            } catch (Throwable throwable) {
-                continue;
-            }
-            if (best == null || dependence.getPriority() > best.getPriority()) {
-                best = dependence;
-            }
+                HudDependence dependence = clazz.getDeclaredConstructor().newInstance();
+
+                if (!dependence.isAvailable()) {
+                    continue;
+                }
+
+                if (best == null || dependence.getPriority() > best.getPriority()) {
+                    best = dependence;
+                }
+            } catch (Throwable _) {}
         }
+
         return best != null ? best : new DefaultHudDependence();
     }
 
