@@ -2,6 +2,7 @@ package fr.neiyo.scoreboard.core;
 
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
@@ -13,22 +14,21 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import fr.neiyo.scoreboard.api.Scoreboard;
 import fr.neiyo.scoreboard.api.renderer.IScoreboardRenderer;
 import fr.neiyo.scoreboard.api.system.IScoreboardSystem;
+import fr.neiyo.scoreboard.core.component.ScoreboardComponent;
 import fr.neiyo.scoreboard.core.dependence.HudDependence;
 import fr.neiyo.scoreboard.core.dependence.HudDependenceProvider;
 import fr.neiyo.scoreboard.core.renderer.MinecraftScoreboardRenderer;
 
 import javax.annotation.Nonnull;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 public final class ScoreboardSystem extends DelayedEntitySystem<EntityStore> implements IScoreboardSystem {
 
-    private final Map<UUID, ScoreboardHUD> scoreboards = new ConcurrentHashMap<>();
+    private final ComponentType<EntityStore, ScoreboardComponent> scoreboardComponentType;
     private final HudDependence hudDependence;
 
-    public ScoreboardSystem() {
+    public ScoreboardSystem(@Nonnull ComponentType<EntityStore, ScoreboardComponent> scoreboardComponentType) {
         super(0.1f);
+        this.scoreboardComponentType = scoreboardComponentType;
         this.hudDependence = HudDependenceProvider.get();
     }
 
@@ -38,9 +38,7 @@ public final class ScoreboardSystem extends DelayedEntitySystem<EntityStore> imp
     }
 
     @Override
-    public void setScoreboard(@Nonnull PlayerRef playerRef, @Nonnull Scoreboard scoreboard, IScoreboardRenderer renderer) {
-        ScoreboardHUD hud = new ScoreboardHUD(playerRef, scoreboard, renderer);
-
+    public void setScoreboard(@Nonnull PlayerRef playerRef, @Nonnull Scoreboard scoreboard, @Nonnull IScoreboardRenderer renderer) {
         Ref<EntityStore> ref = playerRef.getReference();
         if (ref == null) return;
 
@@ -48,15 +46,18 @@ public final class ScoreboardSystem extends DelayedEntitySystem<EntityStore> imp
         Player player = store.getComponent(ref, Player.getComponentType());
         if (player == null) return;
 
+        ScoreboardComponent scoreboardComponent = new ScoreboardComponent(scoreboard, renderer);
+
+        ScoreboardHUD hud = new ScoreboardHUD(playerRef, scoreboard, renderer);
+        scoreboardComponent.setHud(hud);
+
         hudDependence.setCustomHud(player, playerRef, hud);
 
-        scoreboards.put(playerRef.getUuid(), hud);
+        store.addComponent(ref, scoreboardComponentType, scoreboardComponent);
     }
 
     @Override
     public void removeScoreboard(@Nonnull PlayerRef playerRef) {
-        scoreboards.remove(playerRef.getUuid());
-
         Ref<EntityStore> ref = playerRef.getReference();
         if (ref == null) return;
 
@@ -64,26 +65,31 @@ public final class ScoreboardSystem extends DelayedEntitySystem<EntityStore> imp
         World world = store.getExternalData().getWorld();
 
         world.execute(() -> {
+            ScoreboardComponent scoreboardComponent = store.getComponent(ref, scoreboardComponentType);
             Player player = store.getComponent(ref, Player.getComponentType());
-            if (player == null) return;
-            hudDependence.removeCustomHud(player, playerRef);
+
+            if (scoreboardComponent != null && player != null) {
+                hudDependence.removeCustomHud(player, playerRef);
+            }
+
+            store.removeComponent(ref, scoreboardComponentType);
         });
     }
 
     @Override
     public void tick(float deltaTime, int index, @Nonnull ArchetypeChunk<EntityStore> archetypeChunk, @Nonnull Store<EntityStore> store, @Nonnull CommandBuffer<EntityStore> commandBuffer) {
-        Ref<EntityStore> ref = archetypeChunk.getReferenceTo(index);
-        PlayerRef playerRef = store.getComponent(ref, PlayerRef.getComponentType());
+        ScoreboardComponent scoreboardComponent = archetypeChunk.getComponent(index, scoreboardComponentType);
+        if (scoreboardComponent == null) return;
 
-        if (playerRef == null) return;
-        ScoreboardHUD hud = scoreboards.get(playerRef.getUuid());
+        ScoreboardHUD hud = scoreboardComponent.getHud();
         if (hud == null) return;
 
         hud.show();
     }
 
+    @Nonnull
     @Override
-    public @Nonnull Query<EntityStore> getQuery() {
-        return PlayerRef.getComponentType();
+    public Query<EntityStore> getQuery() {
+        return scoreboardComponentType;
     }
 }
