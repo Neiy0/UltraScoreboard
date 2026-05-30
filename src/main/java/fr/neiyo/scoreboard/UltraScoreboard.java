@@ -4,8 +4,8 @@ import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import fr.neiyo.scoreboard.api.ScoreboardProvider;
-import fr.neiyo.scoreboard.core.component.ScoreboardComponent;
 import fr.neiyo.scoreboard.core.ScoreboardSystem;
+import fr.neiyo.scoreboard.core.component.ScoreboardComponent;
 
 import javax.annotation.Nonnull;
 

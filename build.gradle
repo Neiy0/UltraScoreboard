@@ -35,11 +35,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'com.hypixel.hytale:Server:2026.01.24-6e2d4fc36'
-
-    // Multiple HUD support
-    compileOnly "com.buuz135:MultipleHUD:1.0.4"
-    compileOnly("com.github.Flash303:HytaleMultipleHUD:v1")
+    compileOnly 'com.hypixel.hytale:Server:0.5.3'
 }
 
 publishing {

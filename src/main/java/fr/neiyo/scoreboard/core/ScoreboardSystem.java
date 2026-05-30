@@ -1,10 +1,6 @@
 package fr.neiyo.scoreboard.core;
 
-import com.hypixel.hytale.component.ArchetypeChunk;
-import com.hypixel.hytale.component.CommandBuffer;
-import com.hypixel.hytale.component.ComponentType;
-import com.hypixel.hytale.component.Ref;
-import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.component.*;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.DelayedEntitySystem;
 import com.hypixel.hytale.server.core.entity.entities.Player;
@@ -15,8 +11,6 @@ import fr.neiyo.scoreboard.api.Scoreboard;
 import fr.neiyo.scoreboard.api.renderer.IScoreboardRenderer;
 import fr.neiyo.scoreboard.api.system.IScoreboardSystem;
 import fr.neiyo.scoreboard.core.component.ScoreboardComponent;
-import fr.neiyo.scoreboard.core.dependence.HudDependence;
-import fr.neiyo.scoreboard.core.dependence.HudDependenceProvider;
 import fr.neiyo.scoreboard.core.renderer.MinecraftScoreboardRenderer;
 
 import javax.annotation.Nonnull;
@@ -24,12 +18,11 @@ import javax.annotation.Nonnull;
 public final class ScoreboardSystem extends DelayedEntitySystem<EntityStore> implements IScoreboardSystem {
 
     private final ComponentType<EntityStore, ScoreboardComponent> scoreboardComponentType;
-    private final HudDependence hudDependence;
+    private final String hudId = "UltraScoreboard";
 
     public ScoreboardSystem(@Nonnull ComponentType<EntityStore, ScoreboardComponent> scoreboardComponentType) {
         super(0.1f);
         this.scoreboardComponentType = scoreboardComponentType;
-        this.hudDependence = HudDependenceProvider.get();
     }
 
     @Override
@@ -48,10 +41,10 @@ public final class ScoreboardSystem extends DelayedEntitySystem<EntityStore> imp
 
         ScoreboardComponent scoreboardComponent = new ScoreboardComponent(scoreboard, renderer);
 
-        ScoreboardHUD hud = new ScoreboardHUD(playerRef, scoreboard, renderer);
+        ScoreboardHUD hud = new ScoreboardHUD(playerRef, scoreboard, renderer, hudId);
         scoreboardComponent.setHud(hud);
 
-        hudDependence.setCustomHud(player, playerRef, hud);
+        player.getHudManager().addCustomHud(playerRef, hud);
 
         store.addComponent(ref, scoreboardComponentType, scoreboardComponent);
     }
@@ -69,7 +62,7 @@ public final class ScoreboardSystem extends DelayedEntitySystem<EntityStore> imp
             Player player = store.getComponent(ref, Player.getComponentType());
 
             if (scoreboardComponent != null && player != null) {
-                hudDependence.removeCustomHud(player, playerRef);
+                player.getHudManager().removeCustomHud(playerRef, hudId);
             }
 
             store.removeComponent(ref, scoreboardComponentType);

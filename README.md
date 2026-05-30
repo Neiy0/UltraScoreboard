@@ -25,7 +25,7 @@ repositories {
 Add the dependency:
 ```kotlin
 dependencies {
-    implementation("com.github.Neiy0:UltraScoreboard:v1.0.1")
+    implementation("com.github.Neiy0:UltraScoreboard:v1.0.2")
 }
 ```
 
@@ -37,7 +37,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.Neiy0:UltraScoreboard:v1.0.1'
+    implementation 'com.github.Neiy0:UltraScoreboard:v1.0.2'
 }
 ```
 
@@ -58,7 +58,7 @@ Add the dependency:
 <dependency>
     <groupId>com.github.Neiy0</groupId>
     <artifactId>UltraScoreboard</artifactId>
-    <version>v1.0.1</version>
+    <version>v1.0.2</version>
 </dependency>
 ```
 

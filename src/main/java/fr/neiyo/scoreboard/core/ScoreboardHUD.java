@@ -13,8 +13,8 @@ public final class ScoreboardHUD extends CustomUIHud {
     private final Scoreboard scoreboard;
     private final IScoreboardRenderer renderer;
 
-    public ScoreboardHUD(@Nonnull PlayerRef playerRef, @Nonnull Scoreboard scoreboard, @Nonnull IScoreboardRenderer renderer) {
-        super(playerRef);
+    public ScoreboardHUD(@Nonnull PlayerRef playerRef, @Nonnull Scoreboard scoreboard, @Nonnull IScoreboardRenderer renderer, @Nonnull String hudId) {
+        super(playerRef, hudId);
         this.scoreboard = scoreboard;
         this.renderer = renderer;
     }
